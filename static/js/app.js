@@ -28,30 +28,16 @@ let temporizadorMensaje = null;
 let actualizando = false;
 let vencimientoEnProceso = false;
 
-function crearId() {
-  if (window.crypto && window.crypto.randomUUID) {
-    return window.crypto.randomUUID();
-  }
-
-  return `cliente-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-const clienteId = localStorage.getItem("flaskClienteId") || crearId();
-localStorage.setItem("flaskClienteId", clienteId);
-
+// El folio lo asigna Flask usando la cookie de sesion (no localStorage).
+const clienteId = document.getElementById("aplicacion").dataset.reservaId;
 const nombreGuardado = localStorage.getItem("flaskClienteNombre");
 if (nombreGuardado) {
   elementos.clienteNombre.value = nombreGuardado;
 }
-
 elementos.clienteIdCorto.textContent = clienteId.slice(0, 8);
 
 function obtenerCliente() {
-  return {
-    cliente_id: clienteId,
-    cliente_nombre:
-      elementos.clienteNombre.value.trim() || "Comprador sin nombre"
-  };
+  return { cliente_nombre: elementos.clienteNombre.value.trim() || "Comprador sin nombre" };
 }
 
 function escapar(valor) {
@@ -115,7 +101,7 @@ function formatoTiempo(segundos) {
 }
 
 function esMio(boleto) {
-  return boleto.estado === "reservado" && boleto.reservado_por === clienteId;
+  return boleto.estado === "reservado" && boleto.es_mio === true;
 }
 
 function actualizarResumen() {

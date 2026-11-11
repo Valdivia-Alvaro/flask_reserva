@@ -7,6 +7,7 @@
   class="contenedor principal"
   id="aplicacion"
   data-reserva-segundos="{{ reserva_segundos }}"
+  data-reserva-id="{{ reserva_id }}"
 >
   <section class="panel introduccion">
     <div>
@@ -14,7 +15,7 @@
       <h2>Disponible - Reservado - Comprado</h2>
       <p class="sin-margen">
         Al agregar un boleto al carrito se aparta durante
-        <strong>{{ reserva_segundos }} segundos</strong>. Otra persona lo vera
+        <strong>5 minutos</strong>. Otra persona lo vera
         como reservado y no podra seleccionarlo.
       </p>
     </div>
@@ -25,7 +26,7 @@
 
   <section class="panel identidad">
     <div>
-      <p class="etiqueta">Usuario de esta ventana</p>
+      <p class="etiqueta">Usuario de esta sesión</p>
       <h2>Identidad para la demostracion</h2>
       <p class="ayuda sin-margen">
         Abra otra ventana de incognito y escriba otro nombre para simular un
@@ -119,7 +120,7 @@
       <div class="titulo-panel">
         <div>
           <p class="etiqueta naranja">Mi carrito</p>
-          <h2>Reservas de esta ventana</h2>
+          <h2>Mis reservas temporales</h2>
         </div>
       </div>
       <div id="listaCarrito" class="lista-carrito"></div>

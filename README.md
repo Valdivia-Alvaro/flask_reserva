@@ -1,203 +1,53 @@
-# CRUD Flask con carrito y reserva temporal
+# CBTIS - Actividad 2: Reserva temporal de boletos (5 minutos)
 
-Proyecto de demostracion para continuar el CRUD inicial desarrollado con:
+Proyecto Flask + MongoDB Atlas. Modelo: **unidad unica** (cada asiento es un boleto unico).
 
-- Python y Flask.
-- MongoDB Atlas.
-- HTML, CSS y JavaScript.
-- GitHub y Render.
+## Archivos
 
-El ejemplo simula la venta de boletos. Cuando una persona agrega un boleto al
-carrito, queda reservado durante 60 segundos. En otra ventana aparece como
-reservado y no puede seleccionarse. La reserva puede cancelarse, vencer o
-confirmarse como compra.
+- `app.py`: rutas CRUD, reservas y transacciones atomicas.
+- `templates/` y `static/`: interfaz y contador visual.
+- `.env.example`: ejemplo SIN credenciales.
+- `requirements.txt`, `Procfile`, `render.yaml`: despliegue.
 
-## Funciones incluidas
+## Instalacion (Windows, PowerShell)
 
-- Crear, consultar, editar y eliminar boletos.
-- Cargar seis registros de demostracion.
-- Reservar un boleto de manera segura.
-- Identificar quien realizo la reserva.
-- Mostrar un contador en el carrito.
-- Impedir que otro usuario reserve el mismo boleto.
-- Cancelar una reserva.
-- Liberar automaticamente reservas vencidas.
-- Confirmar la compra.
-- Filtrar por disponible, reservado o comprado.
+1. Abre la carpeta `flask_reserva` en Visual Studio Code.
+2. Si trabajas en tu repositorio original, crea tu rama: `git switch -c reserva-temporal`.
+3. Copia estos archivos sobre tu proyecto original **sin sobrescribir `.env` ni `.git`**.
+4. Activa tu entorno virtual (`venv\Scripts\Activate.ps1`) o crea uno con `python -m venv venv`.
+5. Ejecuta `pip install -r requirements.txt`.
+6. Configura `.env` con `MONGO_URI`, `MONGO_DB=reserva_boletos`, `FLASK_SECRET_KEY=...`.
+7. Ejecuta `python app.py` y visita `http://127.0.0.1:5000`.
+8. Pulsa `Cargar 6 boletos de ejemplo` si no tienes registros.
 
-## Estructura del proyecto
+## Modelo de Atlas
 
-```text
-flask_reserva/
-|
-|-- app.py
-|-- requirements.txt
-|-- Procfile
-|-- render.yaml
-|-- .env.example
-|
-|-- templates/
-|   |-- base.html
-|   `-- index.html
-|
-`-- static/
-    |-- css/
-    |   `-- estilos.css
-    `-- js/
-        `-- app.js
-```
+- Coleccion `boletos`: `_id` (asiento unico), `evento`, `asiento`, `estado`, `reserva_id`, `vence_en`.
+- Coleccion `reservas`: `boleto_id`, `reserva_id`, `cantidad: 1`, `estado: activa`, `creada_en`, `vence_en`.
+- Coleccion `compras`: compra confirmada, con boleto y fecha de confirmacion.
+- Se crean indices unicos para `evento + asiento` y `reservas.boleto_id`.
 
-## 1. Abrir en Visual Studio Code
+La coleccion `reservas` se crea automaticamente la primera vez que Flask se conecta a Atlas. El cambio del recurso y del apartado se realiza dentro de **una transaccion MongoDB**. Se necesita un despliegue de Atlas que admita transacciones. Una reserva caducada se libera al recargar/consultar los boletos. El contador no protege disponibilidad: solo informa sobre `vence_en` autorizado por Atlas.
 
-1. Descomprime el archivo ZIP.
-2. Abre Visual Studio Code.
-3. Selecciona **Archivo > Abrir carpeta**.
-4. Elige la carpeta `flask_reserva`.
-5. Abre una terminal dentro de Visual Studio Code.
+## Prueba de 2 usuarios
 
-## 2. Crear el entorno virtual
+1. Abre una ventana normal y otra de incognito. Cada una mostrara folio diferente.
+2. Reserva `A-01` desde la normal; veras `05:00` aproximadamente.
+3. Recarga incognito y comprueba que `A-01` no se puede reservar. Verifica **solo un documento** en `reservas` para ese asiento.
+4. Cancela en ventana normal, recarga incognito y reserva `A-01` desde incognito.
+5. Cancela; vuelve a reservar y deja pasar **5 minutos**. Recarga ambas ventanas: vuelve a disponible.
+6. Reserva y pulsa **Confirmar compra** antes de vencer. `boletos.estado` pasa a `comprado`, se elimina de `reservas` y se crea en `compras`. No debe volver a disponible.
 
-### Windows PowerShell
+## Entrega Classroom
 
-```powershell
-python -m venv venv
-venv\Scripts\Activate.ps1
-```
+Indica nombre del proyecto y recurso (asiento), enlaza el commit o rama de GitHub y la URL publica de Render. Adjunta capturas: `reservas` de Atlas, contador, ambas ventanas, cancelacion o vencimiento y confirmacion.
 
-### Windows CMD
-
-```bat
-python -m venv venv
-venv\Scripts\activate
-```
-
-### macOS o Linux
+## Subir cambios (en tu repositorio)
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+git add app.py templates static requirements.txt .env.example README.md render.yaml Procfile
+git commit -m "Agregar reserva temporal de 5 minutos"
+git push -u origin reserva-temporal
 ```
 
-## 3. Instalar las dependencias
-
-```bash
-pip install -r requirements.txt
-```
-
-## 4. Configurar MongoDB Atlas
-
-1. Copia el archivo `.env.example`.
-2. Cambia el nombre de la copia a `.env`.
-3. Abre `.env` y coloca tu cadena de conexion de Atlas:
-
-```env
-MONGO_URI=mongodb+srv://usuario:contrasena@cluster.mongodb.net/?retryWrites=true&w=majority
-MONGO_DB=reserva_boletos
-RESERVA_SEGUNDOS=60
-PORT=5000
-FLASK_DEBUG=1
-```
-
-No subas el archivo `.env` a GitHub. Ya esta incluido en `.gitignore`.
-
-En MongoDB Atlas comprueba:
-
-- Que el usuario de base de datos tenga permisos de lectura y escritura.
-- Que la contrasena sea correcta.
-- Que Network Access permita la conexion desde tu equipo.
-
-## 5. Ejecutar el proyecto
-
-```bash
-python app.py
-```
-
-En macOS o Linux tambien puede utilizarse:
-
-```bash
-python3 app.py
-```
-
-Abre en el navegador:
-
-```text
-http://127.0.0.1:5000
-```
-
-Presiona **Cargar 6 boletos de ejemplo** para preparar la demostracion.
-
-## 6. Probar dos compradores
-
-1. En la ventana normal escribe `Comprador 1`.
-2. Abre una ventana de incognito en la misma direccion.
-3. En incognito escribe `Comprador 2`.
-4. Reserva el asiento A-01 desde la primera ventana.
-5. Actualiza la segunda ventana.
-6. Comprueba que A-01 aparece reservado.
-7. Intenta reservarlo desde la segunda ventana.
-8. La API debe rechazar la segunda reserva.
-
-Despues pruebe:
-
-- Cancelar la reserva.
-- Dejar que el contador llegue a cero.
-- Confirmar la compra.
-
-## 7. Rutas principales de la API
-
-| Metodo | Ruta | Funcion |
-|---|---|---|
-| GET | `/api/salud` | Comprueba Flask y Atlas |
-| GET | `/api/boletos` | Consulta boletos y libera vencidos |
-| POST | `/api/boletos` | Crea un boleto |
-| PUT | `/api/boletos/<id>` | Edita un boleto disponible |
-| DELETE | `/api/boletos/<id>` | Elimina un boleto disponible |
-| POST | `/api/boletos/semilla` | Carga seis ejemplos |
-| POST | `/api/boletos/<id>/reservar` | Crea la reserva temporal |
-| POST | `/api/boletos/<id>/cancelar` | Cancela la reserva propia |
-| POST | `/api/boletos/<id>/confirmar` | Confirma la compra |
-| POST | `/api/boletos/liberar-vencidas` | Libera reservas vencidas |
-
-## 8. Subir a GitHub
-
-```bash
-git init
-git add .
-git commit -m "CRUD Flask con reserva temporal"
-git branch -M main
-git remote add origin URL_DE_TU_REPOSITORIO
-git push -u origin main
-```
-
-Revise que `.env` no aparezca dentro del repositorio.
-
-## 9. Publicar en Render
-
-1. Crea un nuevo **Web Service**.
-2. Conecta el repositorio de GitHub.
-3. Utiliza estos datos:
-
-```text
-Build Command: pip install -r requirements.txt
-Start Command: gunicorn app:app
-```
-
-4. Agrega las variables de entorno:
-
-```text
-MONGO_URI = cadena completa de MongoDB Atlas
-MONGO_DB = reserva_boletos
-RESERVA_SEGUNDOS = 60
-```
-
-5. Realiza el despliegue.
-
-Para una demostracion rapida use 60 segundos. En el proyecto final puede cambiar
-`RESERVA_SEGUNDOS` a 300 para reservar durante cinco minutos.
-
-## Idea central del ejemplo
-
-La reserva no depende solamente del contador de JavaScript. Flask realiza en
-MongoDB una operacion que cambia el boleto a reservado solo si todavia esta
-disponible. Por eso dos personas no pueden apartar correctamente el mismo
-boleto al mismo tiempo.
+**NUNCA** subas `.env`, contrasenas, `venv/` ni `.git/` como archivos de entrega. En Render configura `MONGO_URI`, `MONGO_DB` y `FLASK_SECRET_KEY` (clave fija compartida por procesos). Despliega la rama `reserva-temporal` en un servicio de prueba o ajusta la rama del servicio existente si quieres actualizarlo.

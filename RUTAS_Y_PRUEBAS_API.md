@@ -1,75 +1,15 @@
-# Rutas y pruebas de la API
+# Rutas y pruebas de API - Actividad 2
 
-La interfaz ya utiliza estas rutas. Tambien pueden probarse con Postman,
-Thunder Client o Insomnia.
+- `GET /api/salud`: comprobar conexion.
+- `GET /api/boletos`: listar y liberar vencidas.
+- `GET /api/reservas`: listar apartados activos del visitante.
+- `POST /api/boletos/semilla`: cargar 6 boletos de prueba.
+- `POST /api/boletos`: crear boleto (`evento`, `zona`, `asiento`, `precio`).
+- `PUT /api/boletos/<id>`: editar si disponible.
+- `DELETE /api/boletos/<id>`: eliminar si disponible.
+- `POST /api/boletos/<id>/reservar`: reservar con `{ "cliente_nombre": "Comprador 1" }`.
+- `POST /api/boletos/<id>/cancelar`: cancelar reserva propia (cookie de sesion).
+- `POST /api/boletos/<id>/confirmar`: confirmar compra propia con `{ "cliente_nombre": "Comprador 1" }`.
+- `POST /api/boletos/liberar-vencidas`: revision explicita de vencidas.
 
-## Crear boleto
-
-```http
-POST /api/boletos
-Content-Type: application/json
-```
-
-```json
-{
-  "evento": "Festival escolar",
-  "zona": "General",
-  "asiento": "C-01",
-  "precio": 180
-}
-```
-
-## Reservar
-
-```http
-POST /api/boletos/ID_DEL_BOLETO/reservar
-Content-Type: application/json
-```
-
-```json
-{
-  "cliente_id": "usuario-1",
-  "cliente_nombre": "Ana Perez"
-}
-```
-
-## Cancelar
-
-```http
-POST /api/boletos/ID_DEL_BOLETO/cancelar
-Content-Type: application/json
-```
-
-```json
-{
-  "cliente_id": "usuario-1",
-  "cliente_nombre": "Ana Perez"
-}
-```
-
-## Confirmar compra
-
-```http
-POST /api/boletos/ID_DEL_BOLETO/confirmar
-Content-Type: application/json
-```
-
-```json
-{
-  "cliente_id": "usuario-1",
-  "cliente_nombre": "Ana Perez"
-}
-```
-
-## Casos de prueba
-
-| Caso | Resultado esperado |
-|---|---|
-| Reservar disponible | Respuesta 200 y estado reservado |
-| Reservar desde otro usuario | Respuesta 409 |
-| Cancelar reserva propia | Regresa a disponible |
-| Cancelar reserva ajena | Respuesta 409 |
-| Confirmar antes de vencer | Cambia a comprado |
-| Confirmar despues de vencer | Respuesta 409 |
-| Editar reservado | Respuesta 409 |
-| Eliminar comprado | Respuesta 409 |
+**Importante:** el ID de reserva proviene de la cookie Flask, no de un identificador manipulable en JavaScript. Los cambios a `boletos`, `reservas` y `compras` usan transacciones cuando es necesario. Todas las fechas se guardan en UTC.
