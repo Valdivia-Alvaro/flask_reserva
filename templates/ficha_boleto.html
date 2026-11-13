@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boleto {{ boleto.asiento }}</title>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+  <main class="contenedor">
+    <section class="panel">
+      <h1>{{ boleto.evento }}</h1>
+      <p><strong>Zona:</strong> {{ boleto.zona }}</p>
+      <p><strong>Asiento:</strong> {{ boleto.asiento }}</p>
+      <p><strong>Precio:</strong> ${{ "%.2f"|format(boleto.precio) }} MXN</p>
+      <p><strong>Estado:</strong> {{ boleto.estado|capitalize }}</p>
+    </section>
+  </main>
+</body>
+</html>
