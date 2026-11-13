@@ -196,7 +196,17 @@ function dibujarTabla() {
             <span class="insignia ${boleto.estado}">${escapar(boleto.estado)}</span>
           </td>
           <td>${textoPropietario(boleto)}</td>
-          <td><div class="acciones-tabla">${botonesBoleto(boleto)}</div></td>
+          <td>
+            <div class="acciones-tabla">
+              ${botonesBoleto(boleto)}
+              <a class="boton pequeno secundario"
+                href="/boleto/${encodeURIComponent(boleto._id)}/qr"
+                target="_blank"
+                rel="noopener">
+              Ver QR
+              </a>
+            </div>
+          </td>
         </tr>
       `
     )
