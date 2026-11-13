@@ -210,7 +210,7 @@ def qr_boleto(boleto_id):
     imagen = qrcode.make(enlace)
 
     archivo = BytesIO()
-    imagen.save(archivo, format="PNG")
+    imagen.save(archivo)
     archivo.seek(0)
     return send_file(archivo, mimetype="image/png")
 
